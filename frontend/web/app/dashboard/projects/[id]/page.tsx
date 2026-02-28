@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
-import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
-import { createBrowserClient } from "@/lib/supabase/client";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/utils";
 
 interface Project {
@@ -25,7 +25,7 @@ export default function ProjectDetailPage({
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
-  const supabase = createBrowserClient();
+  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
