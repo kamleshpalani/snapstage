@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: snapstage-api
+    runtime: node
+    rootDir: backend/api
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    autoDeploy: true
+    plan: free # upgrade to starter/standard for production load
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      # Set these in Render dashboard → Environment
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        sync: false # your Vercel URL e.g. https://snapstage.vercel.app
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: SnapStage <noreply@snapstage.app>
+      - key: APP_BASE_URL
+        sync: false # same as FRONTEND_URL
+      - key: ADMIN_SECRET
+        sync: false # random secret for admin API access

@@ -8,8 +8,17 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.session) {
+      // Fire-and-forget: trigger welcome email for newly-signed-up users
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (apiUrl) {
+        fetch(`${apiUrl}/emails/welcome`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${data.session.access_token}` },
+        }).catch(() => null);
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

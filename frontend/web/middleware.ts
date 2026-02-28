@@ -53,7 +53,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redirect authenticated users away from auth pages
+  // Admin routes — unauthenticated users go to /admin/login
+  // is_admin check happens in the (panel)/layout.tsx server component
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+  const isAdminLoginPage = request.nextUrl.pathname === "/admin/login";
+  if (isAdminRoute && !isAdminLoginPage && !user) {
+    return NextResponse.redirect(new URL("/admin/login", request.url));
+  }
+
+  // Redirect authenticated users away from public auth pages
   const authRoutes = ["/login", "/signup"];
   const isAuthPage = authRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route),
