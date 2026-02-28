@@ -20,7 +20,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center shadow-sm">
-              <Layers className="w-4.5 h-4.5 text-white" />
+              <Layers className="w-[18px] h-[18px] text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">SnapStage</span>
           </Link>
