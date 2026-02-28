@@ -141,8 +141,8 @@ export default function ProjectDetailPage({
       {project.staged_image_url && project.status === "completed" ? (
         <div className="rounded-2xl overflow-hidden mb-6 shadow-md">
           <BeforeAfterSlider
-            beforeUrl={project.original_image_url}
-            afterUrl={project.staged_image_url}
+            beforeSrc={project.original_image_url}
+            afterSrc={project.staged_image_url}
           />
         </div>
       ) : (

@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 export default async function ProjectsPage() {
   const supabase = await createClient();
