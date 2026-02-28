@@ -1,0 +1,32 @@
+{
+  "name": "snapstage",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend/*",
+    "backend/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev --filter=!@snapstage/mobile",
+    "dev:web": "turbo dev --filter=@snapstage/web",
+    "dev:api": "turbo dev --filter=@snapstage/api",
+    "dev:mobile": "turbo dev --filter=@snapstage/mobile",
+    "build": "turbo build --filter=!@snapstage/mobile",
+    "build:web": "turbo build --filter=@snapstage/web",
+    "build:api": "turbo build --filter=@snapstage/api",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "db:types": "supabase gen types typescript --local > packages/db/src/database.types.ts",
+    "db:reset": "supabase db reset",
+    "db:migrate": "supabase migration up"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
