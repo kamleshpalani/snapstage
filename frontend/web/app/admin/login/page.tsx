@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -85,7 +85,10 @@ export default function AdminLoginPage() {
           className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4"
         >
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-1.5">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-zinc-300 mb-1.5"
+            >
               Email
             </label>
             <input
@@ -99,7 +102,10 @@ export default function AdminLoginPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-1.5">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-zinc-300 mb-1.5"
+            >
               Password
             </label>
             <input
@@ -133,5 +139,13 @@ export default function AdminLoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense>
+      <AdminLoginForm />
+    </Suspense>
   );
 }
