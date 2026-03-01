@@ -40,16 +40,16 @@ export async function generateStaging(
   const prompt = STYLE_PROMPTS[style];
 
   const prediction = await replicate.predictions.create({
-    // adirik/interior-design — best public model for room staging
-    model: "adirik/interior-design",
+    // instruct-pix2pix: best for "transform this room" instructions
+    version: "30c1d0b916a6f8efce20493f5d61ee27491ab2a60dc2f8cf9a42a6c0c5dce2ad",
     input: {
       image: imageUrl,
-      prompt: `A beautifully staged empty room with ${prompt}`,
+      prompt: `Transform this empty room into a beautifully staged space with ${prompt}`,
       negative_prompt:
-        "people, humans, text, watermark, blurry, low quality, distorted",
-      prompt_strength: 0.65,
-      num_inference_steps: 30,
-      guidance_scale: 7.5,
+        "people, humans, text, watermark, blurry, low quality, distorted, ugly",
+      num_inference_steps: 100,
+      image_cfg_scale: 1.5,
+      text_cfg_scale: 7.5,
     },
   });
 
