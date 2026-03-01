@@ -44,10 +44,14 @@ async function proxyRequest(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const apiUrl = (process.env.API_URL || "").replace(/\/$/, "");
+  const apiUrl = (
+    process.env.API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    ""
+  ).replace(/\/$/, "");
   if (!apiUrl) {
     return NextResponse.json(
-      { error: "API_URL not configured" },
+      { error: "API_URL not configured — set API_URL or NEXT_PUBLIC_API_URL in Vercel env vars" },
       { status: 500 },
     );
   }
