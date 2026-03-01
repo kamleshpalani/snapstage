@@ -51,12 +51,12 @@ interface PollResponse {
 
 const POLL_INTERVAL_MS = 3000;
 
-const GENERATING_STATUSES: Status[] = [
+const GENERATING_STATUSES = new Set<Status>([
   "queued",
   "preview_generating",
   "hd_generating",
-];
-const isGenerating = (s: Status) => GENERATING_STATUSES.includes(s);
+]);
+const isGenerating = (s: Status) => GENERATING_STATUSES.has(s);
 
 const STYLE_LABELS: Record<string, string> = {
   modern: "Modern",
@@ -161,18 +161,6 @@ export default function StagingWorkflowPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // ── Guards ────────────────────────────────────────────────────────────────
-
-  const checkAuth = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      router.push("/login");
-      return null;
-    }
-    return user;
-  };
 
   // ── Actions ───────────────────────────────────────────────────────────────
 
@@ -295,13 +283,32 @@ export default function StagingWorkflowPage() {
   const styleLabel = STYLE_LABELS[req.style] ?? req.style;
 
   const canApprove = req.status === "preview_ready" && !req.approvedAt;
-  const canGenerateHd =
-    req.status === "approved" && !req.hdCreditDeducted && creditsRemaining > 0;
   const canDownload = req.status === "hd_ready";
   const canRegenerate =
     (req.status === "preview_ready" || req.status === "approved") &&
     req.regenRemaining > 0;
   const hdReady = req.status === "hd_ready";
+
+  // Pre-compute step text to avoid nested ternary operators
+  let approveStepText: string;
+  if (req.approvedAt) {
+    approveStepText = "Preview approved \u2713";
+  } else if (canApprove) {
+    approveStepText = "Happy with the look? Approve it to unlock HD.";
+  } else {
+    approveStepText = "Waiting for preview\u2026";
+  }
+
+  let hdStepText: string;
+  if (req.hdCreditDeducted && req.status === "hd_generating") {
+    hdStepText = "HD image being generated\u2026";
+  } else if (req.hdCreditDeducted) {
+    hdStepText = "HD image ready \u2713";
+  } else if (req.approvedAt) {
+    hdStepText = "Uses 1 credit. Full-resolution, no watermark.";
+  } else {
+    hdStepText = "Approve preview first.";
+  }
 
   return (
     <div>
@@ -596,32 +603,40 @@ function WorkflowStep({
   done,
   active,
   children,
-}: {
+}: Readonly<{
   number: number;
   title: string;
   done: boolean;
   active: boolean;
   children: React.ReactNode;
-}) {
+}>) {
+  let badgeColor: string;
+  if (done) {
+    badgeColor = "bg-green-500 text-white";
+  } else if (active) {
+    badgeColor = "bg-brand-500 text-white";
+  } else {
+    badgeColor = "bg-gray-200 text-gray-500";
+  }
+
+  let titleColor: string;
+  if (active) {
+    titleColor = "text-brand-700";
+  } else if (done) {
+    titleColor = "text-green-700";
+  } else {
+    titleColor = "text-gray-500";
+  }
+
   return (
     <div className="flex gap-3">
       <div
-        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5 ${
-          done
-            ? "bg-green-500 text-white"
-            : active
-              ? "bg-brand-500 text-white"
-              : "bg-gray-200 text-gray-500"
-        }`}
+        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5 ${badgeColor}`}
       >
         {done ? "✓" : number}
       </div>
       <div>
-        <p
-          className={`font-medium text-sm ${active ? "text-brand-700" : done ? "text-green-700" : "text-gray-500"}`}
-        >
-          {title}
-        </p>
+        <p className={`font-medium text-sm ${titleColor}`}>{title}</p>
         <p className="text-xs text-gray-500 mt-0.5">{children}</p>
       </div>
     </div>

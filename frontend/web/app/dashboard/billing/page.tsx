@@ -124,9 +124,9 @@ export default async function BillingPage() {
               </div>
             </div>
             <ul className="space-y-2 mb-6 flex-1">
-              {plan.features.map((f, i) => (
+              {plan.features.map((f) => (
                 <li
-                  key={i}
+                  key={f}
                   className="flex items-center gap-2 text-sm text-slate-600"
                 >
                   <span className="text-green-500">✓</span> {f}
@@ -161,8 +161,8 @@ export default async function BillingPage() {
         Buy Extra Credits
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-        {TOPUP.map((pack, i) => (
-          <form key={i} action="/api/billing/topup" method="POST">
+        {TOPUP.map((pack) => (
+          <form key={pack.label} action="/api/billing/topup" method="POST">
             <input type="hidden" name="credits" value={pack.credits} />
             <button
               type="submit"

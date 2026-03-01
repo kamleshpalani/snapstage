@@ -101,14 +101,12 @@ export default function ProjectDetailScreen() {
     } catch {}
   };
 
-  const statusColor = (s: string) =>
-    s === "completed"
-      ? "#10b981"
-      : s === "processing"
-        ? "#f59e0b"
-        : s === "failed"
-          ? "#ef4444"
-          : "#94a3b8";
+  const statusColor = (s: string) => {
+    if (s === "completed") return "#10b981";
+    if (s === "processing") return "#f59e0b";
+    if (s === "failed") return "#ef4444";
+    return "#94a3b8";
+  };
 
   if (loading) {
     return (
@@ -137,7 +135,7 @@ export default function ProjectDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: `${(project.style ?? "").replace(/_/g, " ")} Room`,
+          title: `${(project.style ?? "").replaceAll("_", " ")} Room`,
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.back()}
@@ -202,7 +200,7 @@ export default function ProjectDetailScreen() {
         <View style={styles.infoCard}>
           <Row
             label="Style"
-            value={(project.style ?? "").replace(/_/g, " ").toUpperCase()}
+            value={(project.style ?? "").replaceAll("_", " ").toUpperCase()}
           />
           <Row label="Status">
             <View

@@ -458,10 +458,14 @@ export default function NewStagingPage() {
 
         {/* Project Name */}
         <div className="card p-6 mb-6">
-          <label className="label text-base font-semibold text-gray-900">
+          <label
+            htmlFor="project-name"
+            className="label text-base font-semibold text-gray-900"
+          >
             Project Name
           </label>
           <input
+            id="project-name"
             type="text"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}

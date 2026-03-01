@@ -29,22 +29,27 @@ export default function SignupPage() {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${globalThis.location.origin}/auth/callback`,
       },
     });
 
     if (error) {
       // Map common Supabase errors to friendly messages
-      const msg =
+      let msg = error.message;
+      if (
         error.message.includes("already registered") ||
         error.message.includes("User already registered")
-          ? "An account with this email already exists. Try signing in instead."
-          : error.message.includes("Password should be")
-            ? "Password must be at least 6 characters."
-            : error.message.includes("invalid") &&
-                error.message.includes("email")
-              ? "Please enter a valid email address."
-              : error.message;
+      ) {
+        msg =
+          "An account with this email already exists. Try signing in instead.";
+      } else if (error.message.includes("Password should be")) {
+        msg = "Password must be at least 6 characters.";
+      } else if (
+        error.message.includes("invalid") &&
+        error.message.includes("email")
+      ) {
+        msg = "Please enter a valid email address.";
+      }
       setError(msg);
       setLoading(false);
       return;
@@ -67,7 +72,7 @@ export default function SignupPage() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${globalThis.location.origin}/auth/callback`,
       },
     });
   };
@@ -164,8 +169,11 @@ export default function SignupPage() {
 
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <label className="label">Full Name</label>
+              <label htmlFor="signup-name" className="label">
+                Full Name
+              </label>
               <input
+                id="signup-name"
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -175,8 +183,11 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label className="label">Email</label>
+              <label htmlFor="signup-email" className="label">
+                Email
+              </label>
               <input
+                id="signup-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -186,8 +197,11 @@ export default function SignupPage() {
               />
             </div>
             <div>
-              <label className="label">Password</label>
+              <label htmlFor="signup-password" className="label">
+                Password
+              </label>
               <input
+                id="signup-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

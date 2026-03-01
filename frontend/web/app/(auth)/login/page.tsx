@@ -42,16 +42,17 @@ export default function LoginPage() {
     });
 
     if (error) {
-      const msg = error.message.includes("Invalid login credentials")
-        ? "Incorrect email or password."
-        : error.message.includes("Email not confirmed")
-          ? "Please confirm your email before signing in."
-          : error.message;
+      let msg = error.message;
+      if (error.message.includes("Invalid login credentials")) {
+        msg = "Incorrect email or password.";
+      } else if (error.message.includes("Email not confirmed")) {
+        msg = "Please confirm your email before signing in.";
+      }
       setError(msg);
       setLoading(false);
     } else {
       // Hard redirect so server-side middleware picks up the new session cookie
-      window.location.href = "/dashboard";
+      globalThis.location.href = "/dashboard";
     }
   };
 
@@ -61,7 +62,7 @@ export default function LoginPage() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${globalThis.location.origin}/auth/callback`,
       },
     });
   };
@@ -137,8 +138,11 @@ export default function LoginPage() {
           {/* Email/Password Form */}
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="label">Email</label>
+              <label htmlFor="login-email" className="label">
+                Email
+              </label>
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -149,7 +153,9 @@ export default function LoginPage() {
             </div>
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="label !mb-0">Password</label>
+                <label htmlFor="login-password" className="label !mb-0">
+                  Password
+                </label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-brand-600 hover:underline"
@@ -158,6 +164,7 @@ export default function LoginPage() {
                 </Link>
               </div>
               <input
+                id="login-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

@@ -21,7 +21,7 @@ const nav = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
-export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
+export function AdminSidebar({ adminEmail }: Readonly<{ adminEmail: string }>) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -39,7 +39,9 @@ export function AdminSidebar({ adminEmail }: { adminEmail: string }) {
           <ShieldCheck className="w-4 h-4 text-zinc-950" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-white leading-none">SnapStage</p>
+          <p className="text-sm font-semibold text-white leading-none">
+            SnapStage
+          </p>
           <p className="text-xs text-zinc-500 mt-0.5">Admin</p>
         </div>
       </div>

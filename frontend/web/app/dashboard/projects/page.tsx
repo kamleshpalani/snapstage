@@ -40,20 +40,7 @@ export default async function ProjectsPage() {
         </Link>
       </div>
 
-      {!projects?.length ? (
-        <div className="text-center py-24">
-          <div className="text-5xl mb-4">🏠</div>
-          <h2 className="text-xl font-semibold text-slate-700 mb-2">
-            No projects yet
-          </h2>
-          <p className="text-slate-400 mb-6">
-            Upload your first room photo to get started.
-          </p>
-          <Link href="/dashboard/new" className="btn-primary inline-block">
-            Create First Staging
-          </Link>
-        </div>
-      ) : (
+      {projects?.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
             <Link
@@ -93,7 +80,7 @@ export default async function ProjectsPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-800 capitalize">
-                  {(project.style ?? "").replace(/_/g, " ")}
+                  {(project.style ?? "").replaceAll("_", " ")}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   {new Date(project.created_at).toLocaleDateString("en-US", {
@@ -105,6 +92,19 @@ export default async function ProjectsPage() {
               </div>
             </Link>
           ))}
+        </div>
+      ) : (
+        <div className="text-center py-24">
+          <div className="text-5xl mb-4">🏠</div>
+          <h2 className="text-xl font-semibold text-slate-700 mb-2">
+            No projects yet
+          </h2>
+          <p className="text-slate-400 mb-6">
+            Upload your first room photo to get started.
+          </p>
+          <Link href="/dashboard/new" className="btn-primary inline-block">
+            Create First Staging
+          </Link>
         </div>
       )}
     </div>

@@ -15,7 +15,7 @@ export default function BeforeAfterSlider({
   afterSrc,
   beforeLabel = "Before",
   afterLabel = "After",
-}: BeforeAfterSliderProps) {
+}: Readonly<BeforeAfterSliderProps>) {
   const [position, setPosition] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -51,14 +51,28 @@ export default function BeforeAfterSlider({
     [updatePosition],
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        setPosition((p) => Math.max(1, p - 1));
+      } else if (e.key === "ArrowRight") {
+        setPosition((p) => Math.min(99, p + 1));
+      }
+    },
+    [],
+  );
+
   return (
     <div
       ref={containerRef}
+      aria-label="Before and after room comparison"
+      tabIndex={0}
       className="relative select-none overflow-hidden rounded-2xl cursor-ew-resize shadow-xl"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onTouchMove={handleTouchMove}
+      onKeyDown={handleKeyDown}
       style={{ touchAction: "none" }}
     >
       {/* After image (full) */}
@@ -91,8 +105,11 @@ export default function BeforeAfterSlider({
       >
         <div className="w-0.5 h-full bg-white shadow-lg" />
         {/* Handle */}
-        <div
-          className="absolute w-10 h-10 bg-white rounded-full shadow-xl border-2 border-gray-200 flex items-center justify-center cursor-ew-resize z-10"
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="Drag to compare"
+          className="absolute w-10 h-10 bg-white rounded-full shadow-xl border-2 border-gray-200 flex items-center justify-center cursor-ew-resize z-10 p-0"
           onMouseDown={handleMouseDown}
           onTouchStart={() => (isDragging.current = true)}
         >

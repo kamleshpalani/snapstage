@@ -11,7 +11,7 @@ interface UserProfile {
   full_name?: string | null;
 }
 
-export function UserEditForm({ user }: { user: UserProfile }) {
+export function UserEditForm({ user }: Readonly<{ user: UserProfile }>) {
   const router = useRouter();
   const [plan, setPlan] = useState(user.plan);
   const [credits, setCredits] = useState(String(user.credits_remaining));
@@ -57,7 +57,10 @@ export function UserEditForm({ user }: { user: UserProfile }) {
   return (
     <form onSubmit={handleSave} className="space-y-4">
       <div>
-        <label htmlFor="plan" className="block text-xs font-medium text-zinc-400 mb-1.5">
+        <label
+          htmlFor="plan"
+          className="block text-xs font-medium text-zinc-400 mb-1.5"
+        >
           Plan
         </label>
         <select
@@ -74,7 +77,10 @@ export function UserEditForm({ user }: { user: UserProfile }) {
       </div>
 
       <div>
-        <label htmlFor="credits" className="block text-xs font-medium text-zinc-400 mb-1.5">
+        <label
+          htmlFor="credits"
+          className="block text-xs font-medium text-zinc-400 mb-1.5"
+        >
           Credits remaining
         </label>
         <input

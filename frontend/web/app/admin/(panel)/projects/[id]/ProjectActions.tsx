@@ -8,10 +8,10 @@ const STATUSES = ["pending", "processing", "completed", "failed"] as const;
 export function ProjectActions({
   projectId,
   currentStatus,
-}: {
+}: Readonly<{
   projectId: string;
   currentStatus: string;
-}) {
+}>) {
   const router = useRouter();
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
@@ -110,7 +110,9 @@ export function ProjectActions({
       </form>
 
       {msg && (
-        <p className={`text-xs ${msg.startsWith("✓") ? "text-emerald-400" : "text-red-400"}`}>
+        <p
+          className={`text-xs ${msg.startsWith("✓") ? "text-emerald-400" : "text-red-400"}`}
+        >
           {msg}
         </p>
       )}

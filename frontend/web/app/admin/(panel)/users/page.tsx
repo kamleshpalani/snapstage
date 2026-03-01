@@ -47,9 +47,9 @@ const planBadge: Record<string, string> = {
 
 export default async function AdminUsersPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: SearchParams;
-}) {
+}>) {
   const { users, total, page, limit } = await getUsers(searchParams);
   const totalPages = Math.ceil(total / limit);
   const search = searchParams.search || "";

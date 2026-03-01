@@ -53,9 +53,9 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 text-sm text-gray-500 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="flex">
-                  {[...Array(5)].map((_, i) => (
+                  {Array.from({ length: 5 }, (_, i) => (
                     <Star
-                      key={i}
+                      key={`star-${i + 1}`}
                       className="w-4 h-4 fill-yellow-400 text-yellow-400"
                     />
                   ))}

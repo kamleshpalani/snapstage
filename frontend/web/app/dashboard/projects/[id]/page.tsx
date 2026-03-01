@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { createClient } from "@/lib/supabase/client";
@@ -19,16 +18,15 @@ interface Project {
 
 export default function ProjectDetailPage({
   params,
-}: {
+}: Readonly<{
   params: { id: string };
-}) {
+}>) {
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | null>(null);
   const supabase = createClient();
-  const router = useRouter();
 
   useEffect(() => {
     fetchProject();
@@ -151,7 +149,7 @@ export default function ProjectDetailPage({
       <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 capitalize">
-            {project.name || (project.style ?? "").replace(/_/g, " ") + " Room"}
+            {project.name || `${(project.style ?? "").replaceAll("_", " ")} Room`}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {formatDate(project.created_at)}
@@ -202,7 +200,7 @@ export default function ProjectDetailPage({
           <dl className="space-y-3">
             <DetailRow
               label="Style"
-              value={(project.style ?? "").replace(/_/g, " ").toUpperCase()}
+              value={(project.style ?? "").replaceAll("_", " ").toUpperCase()}
             />
             <DetailRow
               label="Project ID"
@@ -278,7 +276,7 @@ export default function ProjectDetailPage({
   );
 }
 
-function DetailRow({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
     <div className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
       <dt className="text-sm text-slate-500">{label}</dt>

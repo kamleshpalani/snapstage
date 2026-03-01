@@ -7,13 +7,13 @@ import { useEffect } from "react";
 export default function RootError({
   error,
   reset,
-}: {
+}: Readonly<{
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}>) {
   useEffect(() => {
     if (isChunkError(error)) {
-      window.location.reload();
+      globalThis.location.reload();
     }
   }, [error]);
 

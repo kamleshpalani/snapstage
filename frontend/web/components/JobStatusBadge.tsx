@@ -58,14 +58,14 @@ const CONFIG: Record<
 };
 
 interface JobStatusBadgeProps {
-  status: Status | string;
+  status: Status;
   className?: string;
 }
 
 export default function JobStatusBadge({
   status,
   className = "",
-}: JobStatusBadgeProps) {
+}: Readonly<JobStatusBadgeProps>) {
   const cfg = CONFIG[status as Status] ?? {
     label: status,
     color: "bg-gray-100 text-gray-600",

@@ -2,8 +2,8 @@
 // Login page lives here without the auth guard.
 export default function AdminRootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return <>{children}</>;
 }

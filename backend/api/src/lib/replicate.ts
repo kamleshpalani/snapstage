@@ -237,14 +237,17 @@ export async function getPredictionStatus(
 ): Promise<StagingResult> {
   const prediction = await replicate.predictions.get(predictionId);
 
+  let outputUrl: string | null = null;
+  if (prediction.status === "succeeded" && prediction.output) {
+    outputUrl =
+      typeof prediction.output === "string"
+        ? prediction.output
+        : (prediction.output as string[])[0];
+  }
+
   return {
     predictionId: prediction.id,
-    outputUrl:
-      prediction.status === "succeeded" && prediction.output
-        ? typeof prediction.output === "string"
-          ? prediction.output
-          : (prediction.output as string[])[0]
-        : null,
+    outputUrl,
     status: prediction.status as StagingResult["status"],
   };
 }

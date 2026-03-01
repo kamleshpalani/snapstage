@@ -11,7 +11,7 @@
  */
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { createClient } from "../lib/supabase";
 import {
   generateStagingPreview,
@@ -522,7 +522,7 @@ previewFlowRouter.get(
             .update({ url: signedUrl, expires_at: newExpiry.toISOString() })
             .eq("id", previewOutput.id);
           previewOutput = { ...previewOutput, url: signedUrl };
-        } catch (_) {
+        } catch {
           // Non-fatal — return stale URL
         }
       }
@@ -542,7 +542,7 @@ previewFlowRouter.get(
             height: previewOutput.height,
           }
         : null,
-      hd: outputs.find((o) => o.output_type === "hd") ? { ready: true } : null,
+      hd: outputs.some((o) => o.output_type === "hd") ? { ready: true } : null,
     });
   },
 );

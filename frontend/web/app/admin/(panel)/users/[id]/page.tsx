@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminUserDetailPage({
   params,
-}: {
+}: Readonly<{
   params: { id: string };
-}) {
+}>) {
   const supabase = await createClient();
   const userId = params.id;
 

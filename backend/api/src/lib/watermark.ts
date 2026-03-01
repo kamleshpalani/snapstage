@@ -83,14 +83,14 @@ export async function applyPreviewWatermark(
     .metadata();
 
   // Build SVG overlay
-  const watermarkSvg = buildWatermarkSvg(width!, height!);
+  const watermarkSvg = buildWatermarkSvg(width, height);
 
   const outputBuffer = await resized
     .composite([{ input: watermarkSvg, top: 0, left: 0 }])
     .png({ quality: 80 })
     .toBuffer();
 
-  return { buffer: outputBuffer, width: width!, height: height! };
+  return { buffer: outputBuffer, width, height };
 }
 
 /**

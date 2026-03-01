@@ -19,9 +19,9 @@ const ACTION_LABELS: Record<string, string> = {
 
 export default async function AdminAuditPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: SearchParams;
-}) {
+}>) {
   const supabase = await createClient();
   const page = Number(searchParams.page) || 1;
   const limit = 50;
@@ -91,10 +91,18 @@ export default async function AdminAuditPage({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-zinc-800">
-              <th className="text-left px-5 py-3 text-zinc-500 font-medium">Time</th>
-              <th className="text-left px-5 py-3 text-zinc-500 font-medium">Admin</th>
-              <th className="text-left px-5 py-3 text-zinc-500 font-medium">Action</th>
-              <th className="text-left px-5 py-3 text-zinc-500 font-medium">Target</th>
+              <th className="text-left px-5 py-3 text-zinc-500 font-medium">
+                Time
+              </th>
+              <th className="text-left px-5 py-3 text-zinc-500 font-medium">
+                Admin
+              </th>
+              <th className="text-left px-5 py-3 text-zinc-500 font-medium">
+                Action
+              </th>
+              <th className="text-left px-5 py-3 text-zinc-500 font-medium">
+                Target
+              </th>
               <th className="px-5 py-3" />
             </tr>
           </thead>
@@ -107,11 +115,16 @@ export default async function AdminAuditPage({
               </tr>
             )}
             {(logs ?? []).map((log) => (
-              <tr key={log.id} className="hover:bg-zinc-800/50 transition-colors">
+              <tr
+                key={log.id}
+                className="hover:bg-zinc-800/50 transition-colors"
+              >
                 <td className="px-5 py-3 text-zinc-400 whitespace-nowrap text-xs">
                   {new Date(log.created_at).toLocaleString()}
                 </td>
-                <td className="px-5 py-3 text-zinc-300 text-xs">{log.actor_email}</td>
+                <td className="px-5 py-3 text-zinc-300 text-xs">
+                  {log.actor_email}
+                </td>
                 <td className="px-5 py-3">
                   <span className="text-xs font-medium text-white font-mono">
                     {log.action}

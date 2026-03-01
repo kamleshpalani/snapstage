@@ -96,7 +96,7 @@ export default function SettingsPage() {
       <section className="card mb-6">
         <h2 className="section-label mb-4">Account Info</h2>
         <div className="mb-4">
-          <label className="label">Email Address</label>
+          <p className="label">Email Address</p>
           <p className="input bg-slate-50 text-slate-500 cursor-not-allowed">
             {email}
           </p>

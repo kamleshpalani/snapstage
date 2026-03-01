@@ -7,15 +7,15 @@ import { useEffect } from "react";
 export default function GlobalError({
   error,
   reset,
-}: {
+}: Readonly<{
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}>) {
   useEffect(() => {
     // After a new Render/Vercel deploy the old JS chunk hashes no longer exist.
     // A hard reload fetches fresh HTML with the correct new chunk hashes.
     if (isChunkError(error)) {
-      window.location.reload();
+      globalThis.location.reload();
     }
   }, [error]);
 

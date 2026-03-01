@@ -12,7 +12,7 @@ interface CreditBannerProps {
 export default function CreditBanner({
   credits,
   showHdWarning = false,
-}: CreditBannerProps) {
+}: Readonly<CreditBannerProps>) {
   if (showHdWarning) {
     return (
       <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
@@ -22,7 +22,7 @@ export default function CreditBanner({
             1 credit will be used to generate HD
           </p>
           <p className="text-amber-700 mt-0.5">
-            You have <strong>{credits}</strong> credit{credits !== 1 ? "s" : ""}{" "}
+            You have <strong>{credits}</strong> credit{credits === 1 ? "" : "s"}{" "}
             remaining.
             {credits === 0 && (
               <>
@@ -66,7 +66,7 @@ export default function CreditBanner({
       <Zap className="w-4 h-4 text-brand-500" />
       <span>
         <strong className="text-gray-700">{credits}</strong> credit
-        {credits !== 1 ? "s" : ""} remaining
+        {credits === 1 ? "" : "s"} remaining
       </span>
     </div>
   );

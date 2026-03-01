@@ -49,9 +49,9 @@ const statusBadge: Record<string, string> = {
 
 export default async function AdminProjectsPage({
   searchParams,
-}: {
+}: Readonly<{
   searchParams: SearchParams;
-}) {
+}>) {
   const { projects, total, page, limit, error } =
     await getProjects(searchParams);
   const totalPages = Math.ceil(total / limit);
@@ -153,7 +153,9 @@ export default async function AdminProjectsPage({
                   )}
                 </td>
                 <td className="px-5 py-3 text-zinc-400 text-xs">
-                  {(Array.isArray(p.profiles) ? (p.profiles[0] as { email: string } | undefined)?.email : (p.profiles as { email: string } | null)?.email) ?? "—"}
+                  {(Array.isArray(p.profiles)
+                    ? (p.profiles[0] as { email: string } | undefined)?.email
+                    : (p.profiles as { email: string } | null)?.email) ?? "—"}
                 </td>
                 <td className="px-5 py-3 text-zinc-400 capitalize">
                   {p.style}

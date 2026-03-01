@@ -13,12 +13,12 @@ paymentsRouter.post("/create-checkout", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Missing userId or plan" });
   }
 
-  const priceId =
-    plan === "pro"
-      ? STRIPE_PRICES.pro_monthly
-      : plan === "agency"
-        ? STRIPE_PRICES.agency_monthly
-        : null;
+  let priceId: string | null = null;
+  if (plan === "pro") {
+    priceId = STRIPE_PRICES.pro_monthly;
+  } else if (plan === "agency") {
+    priceId = STRIPE_PRICES.agency_monthly;
+  }
 
   if (!priceId) {
     return res.status(400).json({ error: "Invalid plan" });
@@ -58,7 +58,7 @@ paymentsRouter.post("/webhook", async (req: Request, res: Response) => {
 
   switch (event.type) {
     case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object;
       const { userId, plan } = session.metadata || {};
 
       if (userId && plan) {
@@ -76,7 +76,7 @@ paymentsRouter.post("/webhook", async (req: Request, res: Response) => {
     }
 
     case "customer.subscription.deleted": {
-      const subscription = event.data.object as Stripe.Subscription;
+      const subscription = event.data.object;
       // Downgrade to free plan
       const { data: profile } = await supabase
         .from("profiles")
