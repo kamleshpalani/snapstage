@@ -50,7 +50,7 @@ export default function Hero() {
             </div>
 
             {/* Social proof */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 text-sm text-gray-500">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 text-sm text-gray-500 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="flex">
                   {[...Array(5)].map((_, i) => (
@@ -63,9 +63,17 @@ export default function Hero() {
                 <span>4.9/5 from 2,000+ users</span>
               </div>
               <span className="hidden sm:block text-gray-300">•</span>
-              <span>No credit card required</span>
+              <span className="flex items-center gap-1">
+                🚀 3 free stagings
+              </span>
               <span className="hidden sm:block text-gray-300">•</span>
-              <span>3 free stagings</span>
+              <span className="flex items-center gap-1">
+                💳 No credit card needed
+              </span>
+              <span className="hidden sm:block text-gray-300">•</span>
+              <span className="flex items-center gap-1">
+                ⚡ Credits never expire
+              </span>
             </div>
           </div>
 

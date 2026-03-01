@@ -44,6 +44,54 @@ const STAGING_STYLES = [
     emoji: "🏡",
     description: "Classic & timeless",
   },
+  {
+    id: "bohemian",
+    label: "Bohemian",
+    emoji: "🪴",
+    description: "Eclectic, free-spirited",
+  },
+  {
+    id: "japandi",
+    label: "Japandi",
+    emoji: "🍃",
+    description: "Japanese-Scandi fusion",
+  },
+  {
+    id: "farmhouse",
+    label: "Farmhouse",
+    emoji: "🌾",
+    description: "Rustic, warm & inviting",
+  },
+  {
+    id: "art_deco",
+    label: "Art Deco",
+    emoji: "🔶",
+    description: "Bold geometry & glamour",
+  },
+  {
+    id: "mediterranean",
+    label: "Mediterranean",
+    emoji: "🌅",
+    description: "Warm terracotta & blue",
+  },
+  {
+    id: "mid_century",
+    label: "Mid-Century",
+    emoji: "🛋️",
+    description: "Retro 50s–60s style",
+  },
+  {
+    id: "renovation",
+    label: "Renovation",
+    emoji: "🔨",
+    description: "Show full potential after reno",
+  },
+  {
+    id: "declutter",
+    label: "Declutter",
+    emoji: "🧹",
+    description: "Empty & clean empty room",
+  },
 ];
 
 export default function NewStagingPage() {
