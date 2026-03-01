@@ -40,8 +40,8 @@ export async function generateStaging(
   const prompt = STYLE_PROMPTS[style];
 
   const prediction = await replicate.predictions.create({
-    // instruct-pix2pix: best for "transform this room" instructions
-    version: "30c1d0b916a6f8efce20493f5d61ee27491ab2a60dc2f8cf9a42a6c0c5dce2ad",
+    // Use model identifier — SDK resolves to latest official version automatically
+    model: "timothybrooks/instruct-pix2pix",
     input: {
       image: imageUrl,
       prompt: `Transform this empty room into a beautifully staged space with ${prompt}`,
