@@ -161,7 +161,6 @@ export default function StagingWorkflowPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-
   // ── Actions ───────────────────────────────────────────────────────────────
 
   const handleApprove = async () => {
