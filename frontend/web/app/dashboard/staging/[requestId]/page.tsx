@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import JobStatusBadge from "@/components/JobStatusBadge";
 import CreditBanner from "@/components/CreditBanner";
@@ -115,7 +114,6 @@ const STYLE_LABELS: Record<string, string> = {
 
 export default function StagingWorkflowPage() {
   const { requestId } = useParams<{ requestId: string }>();
-  const supabase = createClient();
 
   const [data, setData] = useState<PollResponse | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -444,11 +442,7 @@ export default function StagingWorkflowPage() {
               done={!!req.approvedAt}
               active={req.status === "preview_ready"}
             >
-              {req.approvedAt
-                ? "Preview approved ✓"
-                : canApprove
-                  ? "Happy with the look? Approve it to unlock HD."
-                  : "Waiting for preview…"}
+              {approveStepText}
             </WorkflowStep>
 
             {/* Step 3: Generate HD */}
@@ -460,13 +454,7 @@ export default function StagingWorkflowPage() {
                 req.status === "approved" || req.status === "hd_generating"
               }
             >
-              {req.hdCreditDeducted
-                ? req.status === "hd_generating"
-                  ? "HD image being generated…"
-                  : "HD image ready ✓"
-                : req.approvedAt
-                  ? "Uses 1 credit. Full-resolution, no watermark."
-                  : "Approve preview first."}
+              {hdStepText}
             </WorkflowStep>
 
             {/* Step 4: Download */}

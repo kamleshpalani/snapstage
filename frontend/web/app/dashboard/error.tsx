@@ -6,13 +6,13 @@ import Link from "next/link";
 export default function DashboardError({
   error,
   reset,
-}: {
+}: Readonly<{
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}>) {
   useEffect(() => {
     if (isChunkError(error)) {
-      window.location.reload();
+      globalThis.location.reload();
     }
   }, [error]);
 
