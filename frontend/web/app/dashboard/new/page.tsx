@@ -406,8 +406,8 @@ export default function NewStagingPage() {
           `Failed to create project: ${getErrorMessage(dbError)}`,
         );
 
-      // 4. Trigger AI staging via Next.js server route (non-blocking)
-      fetch("/api/staging/trigger", {
+      // 4. Kick off Preview → Approve → HD workflow (v2 flow)
+      const stagingRes = await fetch("/api/staging/v2/preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -415,9 +415,17 @@ export default function NewStagingPage() {
           imageUrl: publicUrl,
           style: selectedStyle,
         }),
-      }).catch((fetchErr) => console.error("Staging trigger error:", fetchErr));
+      });
 
-      router.push(`/dashboard/projects/${project.id}`);
+      const stagingData = await stagingRes.json().catch(() => ({}));
+      if (!stagingRes.ok) {
+        throw new Error(
+          stagingData.error ?? "Failed to start staging. Please try again.",
+        );
+      }
+
+      const requestId: string = stagingData.requestId;
+      router.push(`/dashboard/staging/${requestId}`);
     } catch (err: unknown) {
       console.error("New staging error:", err);
       setError(getErrorMessage(err));
@@ -511,17 +519,18 @@ export default function NewStagingPage() {
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Generating staging...
+              Creating preview...
             </>
           ) : (
             <>
               <Sparkles className="w-5 h-5" />
-              Generate Staged Room
+              Generate Free Preview
             </>
           )}
         </button>
         <p className="text-center text-xs text-gray-400 mt-3">
-          This will use 1 credit · Usually takes 30–90 seconds
+          Free watermarked preview · Approve &amp; pay 1 credit for full HD
+          download
         </p>
       </form>
     </div>

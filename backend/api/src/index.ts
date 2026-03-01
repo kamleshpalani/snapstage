@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { stagingRouter } from "./routes/staging";
+import { previewFlowRouter } from "./routes/previewFlow";
 import { paymentsRouter } from "./routes/payments";
 import { adminRouter } from "./routes/admin";
 import { emailsRouter } from "./routes/emails";
@@ -47,6 +48,7 @@ app.get("/health", (_req, res) => {
 
 // ─── Routes ─────────────────────────────────────────────
 app.use("/staging", stagingRouter);
+app.use("/staging/v2", previewFlowRouter);
 app.use("/payments", paymentsRouter);
 app.use("/admin", adminRouter);
 app.use("/emails", emailsRouter);

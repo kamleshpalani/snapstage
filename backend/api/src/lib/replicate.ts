@@ -167,32 +167,69 @@ export interface StagingResult {
   status: "starting" | "processing" | "succeeded" | "failed";
 }
 
+function buildPrompt(style: StagingStyle, prompt: string): string {
+  if (style === "declutter")
+    return `${prompt}. Remove all furniture, clutter and personal items. Keep the exact same room structure, walls, floors, windows and doors.`;
+  if (style === "renovation")
+    return `${prompt}. Keep the same room dimensions and structure but update all surfaces, finishes and fixtures to look freshly renovated.`;
+  return `Transform this empty room into a beautifully furnished and staged space with ${prompt}. Keep the same room layout, walls, windows and floors. Add furniture, decor, and lighting.`;
+}
+
+/** Legacy single-step generate (used by existing /staging/generate route) */
 export async function generateStaging(
   imageUrl: string,
   style: StagingStyle,
 ): Promise<StagingResult> {
   const prompt = STYLE_PROMPTS[style];
-
   const prediction = await replicate.predictions.create({
-    // flux-kontext-pro: official Black Forest Labs image editing model
     model: "black-forest-labs/flux-kontext-pro",
     input: {
       input_image: imageUrl,
-      prompt:
-        style === "declutter"
-          ? `${prompt}. Remove all furniture, clutter and personal items. Keep the exact same room structure, walls, floors, windows and doors.`
-          : style === "renovation"
-            ? `${prompt}. Keep the same room dimensions and structure but update all surfaces, finishes and fixtures to look freshly renovated.`
-            : `Transform this empty room into a beautifully furnished and staged space with ${prompt}. Keep the same room layout, walls, windows and floors. Add furniture, decor, and lighting.`,
+      prompt: buildPrompt(style, prompt),
       output_quality: 90,
     },
   });
+  return { predictionId: prediction.id, outputUrl: null, status: "starting" };
+}
 
-  return {
-    predictionId: prediction.id,
-    outputUrl: null,
-    status: "starting",
-  };
+/**
+ * Preview generation — lower output_quality for faster turnaround.
+ * Result will be watermarked + resized to 1024px by the API layer.
+ */
+export async function generateStagingPreview(
+  imageUrl: string,
+  style: StagingStyle,
+): Promise<StagingResult> {
+  const prompt = STYLE_PROMPTS[style];
+  const prediction = await replicate.predictions.create({
+    model: "black-forest-labs/flux-kontext-pro",
+    input: {
+      input_image: imageUrl,
+      prompt: buildPrompt(style, prompt),
+      output_quality: 65, // fast preview — watermarked anyway
+    },
+  });
+  return { predictionId: prediction.id, outputUrl: null, status: "starting" };
+}
+
+/**
+ * HD generation — maximum quality, no watermark, full resolution.
+ * Only called after preview is approved + credit deducted.
+ */
+export async function generateStagingHd(
+  imageUrl: string,
+  style: StagingStyle,
+): Promise<StagingResult> {
+  const prompt = STYLE_PROMPTS[style];
+  const prediction = await replicate.predictions.create({
+    model: "black-forest-labs/flux-kontext-pro",
+    input: {
+      input_image: imageUrl,
+      prompt: buildPrompt(style, prompt),
+      output_quality: 95, // maximum HD quality
+    },
+  });
+  return { predictionId: prediction.id, outputUrl: null, status: "starting" };
 }
 
 export async function getPredictionStatus(
