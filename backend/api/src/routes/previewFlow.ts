@@ -498,12 +498,13 @@ previewFlowRouter.get(
         .json({ error: "Request not found or access denied" });
     }
 
-    // Get outputs
-    const { data: outputs = [] } = await supabase
+    // Get outputs (data can be null on error, so coerce to [])
+    const { data: rawOutputs } = await supabase
       .from("staging_outputs")
       .select("*")
       .eq("request_id", requestId)
       .order("created_at", { ascending: false });
+    const outputs = rawOutputs ?? [];
 
     // Auto-refresh preview signed URL if <5 minutes remain before expiry
     let previewOutput = outputs.find((o) => o.output_type === "preview");
