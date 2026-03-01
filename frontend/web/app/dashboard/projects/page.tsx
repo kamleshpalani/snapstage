@@ -93,7 +93,7 @@ export default async function ProjectsPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-800 capitalize">
-                  {project.staging_style.replace(/_/g, " ")}
+                  {(project.style ?? "").replace(/_/g, " ")}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   {new Date(project.created_at).toLocaleDateString("en-US", {

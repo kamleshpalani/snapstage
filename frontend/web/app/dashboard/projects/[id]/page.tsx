@@ -9,11 +9,11 @@ import { formatDate } from "@/lib/utils";
 
 interface Project {
   id: string;
+  name: string;
   original_image_url: string;
   staged_image_url: string | null;
-  staging_style: string;
+  style: string;
   status: string;
-  credits_used: number;
   created_at: string;
 }
 
@@ -122,7 +122,7 @@ export default function ProjectDetailPage({
       <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 capitalize">
-            {project.staging_style.replace(/_/g, " ")} Room
+            {project.name || (project.style ?? "").replace(/_/g, " ") + " Room"}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {formatDate(project.created_at)}
@@ -173,11 +173,7 @@ export default function ProjectDetailPage({
           <dl className="space-y-3">
             <DetailRow
               label="Style"
-              value={project.staging_style.replace(/_/g, " ").toUpperCase()}
-            />
-            <DetailRow
-              label="Credits Used"
-              value={`${project.credits_used} credit${project.credits_used !== 1 ? "s" : ""}`}
+              value={(project.style ?? "").replace(/_/g, " ").toUpperCase()}
             />
             <DetailRow
               label="Project ID"
