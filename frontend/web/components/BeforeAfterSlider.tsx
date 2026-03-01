@@ -24,7 +24,8 @@ export default function BeforeAfterSlider({
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    setPosition((x / rect.width) * 100);
+    // Clamp to [1, 99] to prevent division-by-zero in the before-clip style calc
+    setPosition(Math.max(1, Math.min(99, (x / rect.width) * 100)));
   }, []);
 
   const handleMouseDown = () => {
