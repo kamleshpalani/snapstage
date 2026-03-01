@@ -15,11 +15,15 @@ export async function GET() {
   ).replace(/\/$/, "");
 
   if (!apiUrl) {
-    return NextResponse.json({
-      ok: false,
-      problem: "API_URL and NEXT_PUBLIC_API_URL are both unset in Vercel env vars",
-      fix: "Add API_URL = https://snapstage-api.onrender.com (or your Render URL) in Vercel → Settings → Environment Variables",
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        problem:
+          "API_URL and NEXT_PUBLIC_API_URL are both unset in Vercel env vars",
+        fix: "Add API_URL = https://snapstage-api.onrender.com (or your Render URL) in Vercel → Settings → Environment Variables",
+      },
+      { status: 500 },
+    );
   }
 
   // Ping the backend health endpoint
@@ -29,18 +33,21 @@ export async function GET() {
     const body = await res.text().catch(() => "");
     return NextResponse.json({
       ok: res.ok,
-      apiUrl: apiUrl.replace(/^(https?:\/\/[^/]{4}).*/, "$1***"),  // mask most of the domain
+      apiUrl: apiUrl.replace(/^(https?:\/\/[^/]{4}).*/, "$1***"), // mask most of the domain
       status: res.status,
       backendResponse: body.slice(0, 200),
     });
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({
-      ok: false,
-      apiUrl: apiUrl.replace(/^(https?:\/\/[^/]{4}).*/, "$1***"),
-      problem: "Fetch to backend /health failed",
-      detail,
-      fix: "Check Render dashboard — service may be stopped, sleeping, or the URL is wrong",
-    }, { status: 502 });
+    return NextResponse.json(
+      {
+        ok: false,
+        apiUrl: apiUrl.replace(/^(https?:\/\/[^/]{4}).*/, "$1***"),
+        problem: "Fetch to backend /health failed",
+        detail,
+        fix: "Check Render dashboard — service may be stopped, sleeping, or the URL is wrong",
+      },
+      { status: 502 },
+    );
   }
 }

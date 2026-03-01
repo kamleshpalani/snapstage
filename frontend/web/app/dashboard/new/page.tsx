@@ -419,7 +419,8 @@ export default function NewStagingPage() {
 
       const stagingData = await stagingRes.json().catch(() => ({}));
       if (!stagingRes.ok) {
-        const msg = stagingData.error ?? "Failed to start staging. Please try again.";
+        const msg =
+          stagingData.error ?? "Failed to start staging. Please try again.";
         const detail = stagingData.detail ? ` — ${stagingData.detail}` : "";
         throw new Error(msg + detail);
       }
