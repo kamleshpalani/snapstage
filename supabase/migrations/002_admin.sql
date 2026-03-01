@@ -73,6 +73,7 @@ alter table public.password_reset_tokens enable row level security;
 alter table public.notifications       enable row level security;
 
 -- audit_logs: only admins can read; service role writes
+drop policy if exists "Admins can view audit logs" on public.audit_logs;
 create policy "Admins can view audit logs"
   on public.audit_logs for select
   using (
@@ -83,6 +84,7 @@ create policy "Admins can view audit logs"
   );
 
 -- project_notes: admins see all; regular users see notes on their own projects
+drop policy if exists "Admins can view all project notes" on public.project_notes;
 create policy "Admins can view all project notes"
   on public.project_notes for select
   using (
@@ -92,6 +94,7 @@ create policy "Admins can view all project notes"
     )
   );
 
+drop policy if exists "Users can view notes on own projects" on public.project_notes;
 create policy "Users can view notes on own projects"
   on public.project_notes for select
   using (
@@ -102,10 +105,12 @@ create policy "Users can view notes on own projects"
   );
 
 -- notifications: users read their own
+drop policy if exists "Users can view own notifications" on public.notifications;
 create policy "Users can view own notifications"
   on public.notifications for select
   using (auth.uid() = user_id);
 
+drop policy if exists "Users can mark own notifications read" on public.notifications;
 create policy "Users can mark own notifications read"
   on public.notifications for update
   using (auth.uid() = user_id);
@@ -113,6 +118,7 @@ create policy "Users can mark own notifications read"
 -- password_reset_tokens: service role only (no user-level select policy)
 
 -- ─── 7. Admin can SELECT all profiles + projects (for admin panel queries) ───
+drop policy if exists "Admins can view all profiles" on public.profiles;
 create policy "Admins can view all profiles"
   on public.profiles for select
   using (
@@ -126,6 +132,7 @@ create policy "Admins can view all profiles"
 -- Drop the old single-user policy (replaced by the combined one above)
 drop policy if exists "Users can view own profile" on public.profiles;
 
+drop policy if exists "Admins can view all projects" on public.projects;
 create policy "Admins can view all projects"
   on public.projects for select
   using (
