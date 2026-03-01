@@ -79,17 +79,15 @@ stagingRouter.post("/generate", async (req: Request, res: Response) => {
     pollForResult(projectId, result.predictionId, userId, style, supabase);
 
     // Notify admin of new project (fire-and-forget)
-    supabase
-      .from("profiles")
-      .select("email")
-      .eq("id", userId)
-      .single()
+    void Promise.resolve(
+      supabase.from("profiles").select("email").eq("id", userId).single(),
+    )
       .then(({ data: ownerProfile }) => {
         if (ownerProfile?.email) {
           sendAdminNewProjectEmail({
             userEmail: ownerProfile.email,
             projectId,
-            projectName: projectId, // will be updated once we have the name
+            projectName: projectId,
             style,
           }).catch(console.error);
         }
