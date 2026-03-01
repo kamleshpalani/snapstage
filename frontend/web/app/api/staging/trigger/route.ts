@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const apiUrl = process.env.API_URL;
+  const apiUrl = process.env.API_URL?.replace(/\/$/, ""); // strip trailing slash
   if (!apiUrl) {
     return NextResponse.json(
       {

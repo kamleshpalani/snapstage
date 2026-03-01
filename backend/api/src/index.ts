@@ -37,6 +37,10 @@ app.use("/payments/webhook", express.raw({ type: "application/json" }));
 app.use(express.json({ limit: "10mb" }));
 
 // ─── Health Check ────────────────────────────────────────
+app.get("/", (_req, res) => {
+  res.json({ service: "SnapStage API", status: "ok" });
+});
+
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
