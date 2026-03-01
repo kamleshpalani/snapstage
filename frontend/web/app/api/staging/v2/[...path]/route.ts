@@ -51,7 +51,10 @@ async function proxyRequest(
   ).replace(/\/$/, "");
   if (!apiUrl) {
     return NextResponse.json(
-      { error: "API_URL not configured — set API_URL or NEXT_PUBLIC_API_URL in Vercel env vars" },
+      {
+        error:
+          "API_URL not configured — set API_URL or NEXT_PUBLIC_API_URL in Vercel env vars",
+      },
       { status: 500 },
     );
   }
@@ -89,9 +92,14 @@ async function proxyRequest(
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
   } catch (err) {
-    console.error("[staging/v2 proxy] error:", err);
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("[staging/v2 proxy] fetch failed →", targetUrl, detail);
     return NextResponse.json(
-      { error: "Failed to reach staging service" },
+      {
+        error: "Failed to reach staging service",
+        detail,
+        target: targetUrl.replace(/userId=[^&]+/, "userId=***"),
+      },
       { status: 502 },
     );
   }
