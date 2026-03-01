@@ -25,6 +25,8 @@ export default function ProjectDetailPage({
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
@@ -63,6 +65,33 @@ export default function ProjectDetailPage({
     }
     setProject(data);
     setLoading(false);
+  };
+
+  const handleRetry = async () => {
+    if (!project) return;
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      const res = await fetch("/api/staging/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: project.id,
+          imageUrl: project.original_image_url,
+          style: project.style,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to start staging");
+      // Update local state optimistically
+      setProject((p) => (p ? { ...p, status: "processing" } : p));
+    } catch (err) {
+      setRetryError(
+        err instanceof Error ? err.message : "Failed to start staging",
+      );
+    } finally {
+      setRetrying(false);
+    }
   };
 
   const handleDownload = async (url: string, filename: string) => {
@@ -187,6 +216,32 @@ export default function ProjectDetailPage({
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">
             Actions
           </h2>
+          {retryError && (
+            <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">
+              {retryError}
+            </p>
+          )}
+          {(project.status === "pending" || project.status === "failed") && (
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="btn-primary flex items-center justify-center gap-2"
+            >
+              {retrying ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />{" "}
+                  Starting…
+                </>
+              ) : (
+                <>
+                  ✨{" "}
+                  {project.status === "failed"
+                    ? "Retry Staging"
+                    : "Start Staging"}
+                </>
+              )}
+            </button>
+          )}
           {project.staged_image_url && project.status === "completed" && (
             <>
               <button

@@ -134,24 +134,16 @@ export default function NewStagingPage() {
           `Failed to create project: ${getErrorMessage(dbError)}`,
         );
 
-      // 4. Trigger AI staging via API (non-blocking — don't let this stop the redirect)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (apiUrl) {
-        fetch(`${apiUrl}/staging/generate`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            projectId: project.id,
-            imageUrl: publicUrl,
-            style: selectedStyle,
-            userId: user.id,
-          }),
-        }).catch((fetchErr) => console.error("Staging API error:", fetchErr));
-      } else {
-        console.warn(
-          "NEXT_PUBLIC_API_URL is not set — staging generation skipped.",
-        );
-      }
+      // 4. Trigger AI staging via Next.js server route (non-blocking)
+      fetch("/api/staging/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: project.id,
+          imageUrl: publicUrl,
+          style: selectedStyle,
+        }),
+      }).catch((fetchErr) => console.error("Staging trigger error:", fetchErr));
 
       router.push(`/dashboard/projects/${project.id}`);
     } catch (err: unknown) {
