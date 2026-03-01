@@ -89,11 +89,15 @@ export default function NewStagingPage() {
       if (!user) throw new Error("Not authenticated. Please sign in again.");
 
       // Ensure profile row exists (safety upsert in case trigger didn't fire)
-      await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .upsert(
           { id: user.id, email: user.email ?? "" },
           { onConflict: "id", ignoreDuplicates: true },
+        );
+      if (profileError)
+        throw new Error(
+          `Profile setup failed: ${getErrorMessage(profileError)}`,
         );
 
       // 1. Upload original image to Supabase Storage
