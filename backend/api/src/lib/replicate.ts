@@ -40,16 +40,12 @@ export async function generateStaging(
   const prompt = STYLE_PROMPTS[style];
 
   const prediction = await replicate.predictions.create({
-    // Use model identifier — SDK resolves to latest official version automatically
-    model: "timothybrooks/instruct-pix2pix",
+    // flux-kontext-pro: official Black Forest Labs image editing model
+    model: "black-forest-labs/flux-kontext-pro",
     input: {
-      image: imageUrl,
-      prompt: `Transform this empty room into a beautifully staged space with ${prompt}`,
-      negative_prompt:
-        "people, humans, text, watermark, blurry, low quality, distorted, ugly",
-      num_inference_steps: 100,
-      image_cfg_scale: 1.5,
-      text_cfg_scale: 7.5,
+      input_image: imageUrl,
+      prompt: `Transform this empty room into a beautifully furnished and staged space with ${prompt}. Keep the same room layout, walls, windows and floors. Add furniture, decor, and lighting.`,
+      output_quality: 90,
     },
   });
 
@@ -69,7 +65,9 @@ export async function getPredictionStatus(
     predictionId: prediction.id,
     outputUrl:
       prediction.status === "succeeded" && prediction.output
-        ? (prediction.output as string[])[0]
+        ? typeof prediction.output === "string"
+          ? prediction.output
+          : (prediction.output as string[])[0]
         : null,
     status: prediction.status as StagingResult["status"],
   };
