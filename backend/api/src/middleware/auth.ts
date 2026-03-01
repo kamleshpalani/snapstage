@@ -26,6 +26,18 @@ export async function authMiddleware(
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 
+  // Guard: check the user still has a profile row (catches deleted accounts
+  // whose JWT has not yet expired).
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile) {
+    return res.status(401).json({ error: "Account no longer exists" });
+  }
+
   // Attach user to request
   (req as Request & { user: typeof user }).user = user;
   next();

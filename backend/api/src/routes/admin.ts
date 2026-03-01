@@ -114,11 +114,7 @@ adminRouter.get("/users/:id", async (req: Request, res: Response) => {
 
   const [{ data: profile }, { data: projects }, { data: transactions }] =
     await Promise.all([
-      supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single(),
+      supabase.from("profiles").select("*").eq("id", userId).single(),
       supabase
         .from("projects")
         .select("id, name, status, style, created_at, staged_image_url")
@@ -134,7 +130,50 @@ adminRouter.get("/users/:id", async (req: Request, res: Response) => {
 
   if (!profile) return res.status(404).json({ error: "User not found" });
 
-  return res.json({ profile, projects: projects ?? [], transactions: transactions ?? [] });
+  return res.json({
+    profile,
+    projects: projects ?? [],
+    transactions: transactions ?? [],
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DELETE /admin/users/:id — permanently delete user from auth + profile
+// ─────────────────────────────────────────────────────────────────────────────
+adminRouter.delete("/users/:id", async (req: Request, res: Response) => {
+  const admin = (req as AdminRequest).adminUser;
+  const supabase = createClient();
+  const userId = req.params.id;
+
+  // Fetch profile for audit snapshot before deletion
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (!profile) return res.status(404).json({ error: "User not found" });
+
+  // Delete from Supabase Auth — this invalidates all sessions/tokens immediately
+  // and cascades to the profiles row (via on delete cascade in migrations)
+  const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+
+  if (authError) {
+    return res.status(500).json({ error: authError.message });
+  }
+
+  await writeAudit({
+    actorId: admin.id,
+    actorEmail: admin.email,
+    action: "delete_user",
+    targetType: "user",
+    targetId: userId,
+    beforeData: profile,
+    afterData: null,
+    ip: getIp(req),
+  });
+
+  return res.json({ success: true, deletedUserId: userId });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -297,45 +336,50 @@ adminRouter.get("/projects/:id", async (req: Request, res: Response) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // PATCH /admin/projects/:id/status — update project status
 // ─────────────────────────────────────────────────────────────────────────────
-adminRouter.patch("/projects/:id/status", async (req: Request, res: Response) => {
-  const admin = (req as AdminRequest).adminUser;
-  const supabase = createClient();
-  const projectId = req.params.id;
-  const { status } = req.body as { status: string };
+adminRouter.patch(
+  "/projects/:id/status",
+  async (req: Request, res: Response) => {
+    const admin = (req as AdminRequest).adminUser;
+    const supabase = createClient();
+    const projectId = req.params.id;
+    const { status } = req.body as { status: string };
 
-  const validStatuses = ["pending", "processing", "completed", "failed"];
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({ error: `status must be one of: ${validStatuses.join(", ")}` });
-  }
+    const validStatuses = ["pending", "processing", "completed", "failed"];
+    if (!validStatuses.includes(status)) {
+      return res
+        .status(400)
+        .json({ error: `status must be one of: ${validStatuses.join(", ")}` });
+    }
 
-  const { data: before } = await supabase
-    .from("projects")
-    .select("status")
-    .eq("id", projectId)
-    .single();
+    const { data: before } = await supabase
+      .from("projects")
+      .select("status")
+      .eq("id", projectId)
+      .single();
 
-  const { data: project, error } = await supabase
-    .from("projects")
-    .update({ status })
-    .eq("id", projectId)
-    .select()
-    .single();
+    const { data: project, error } = await supabase
+      .from("projects")
+      .update({ status })
+      .eq("id", projectId)
+      .select()
+      .single();
 
-  if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: error.message });
 
-  await writeAudit({
-    actorId: admin.id,
-    actorEmail: admin.email,
-    action: "update_project_status",
-    targetType: "project",
-    targetId: projectId,
-    beforeData: before,
-    afterData: { status },
-    ip: getIp(req),
-  });
+    await writeAudit({
+      actorId: admin.id,
+      actorEmail: admin.email,
+      action: "update_project_status",
+      targetType: "project",
+      targetId: projectId,
+      beforeData: before,
+      afterData: { status },
+      ip: getIp(req),
+    });
 
-  return res.json({ project });
-});
+    return res.json({ project });
+  },
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /admin/projects/:id/notes — add internal note
@@ -416,7 +460,10 @@ adminRouter.delete("/projects/:id", async (req: Request, res: Response) => {
     .eq("id", projectId)
     .single();
 
-  const { error } = await supabase.from("projects").delete().eq("id", projectId);
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("id", projectId);
   if (error) return res.status(500).json({ error: error.message });
 
   await writeAudit({

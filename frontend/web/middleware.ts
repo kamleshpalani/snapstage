@@ -43,6 +43,31 @@ export async function middleware(request: NextRequest) {
     // If auth check fails, treat as unauthenticated
   }
 
+  // If auth says the user exists, verify they still have a profile row.
+  // This catches the case where an admin deleted the user from Supabase
+  // but the JWT hasn't expired yet.
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!profile) {
+      // No profile = account deleted. Clear all Supabase auth cookies and
+      // redirect to login so the client session is fully wiped.
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("reason", "account_deleted");
+      const clearResponse = NextResponse.redirect(loginUrl);
+      request.cookies.getAll().forEach((cookie) => {
+        if (cookie.name.startsWith("sb-")) {
+          clearResponse.cookies.delete(cookie.name);
+        }
+      });
+      return clearResponse;
+    }
+  }
+
   // Redirect unauthenticated users away from protected routes
   const protectedRoutes = ["/dashboard"];
   const isProtected = protectedRoutes.some((route) =>

@@ -3,11 +3,15 @@
 export const dynamic = "force-dynamic";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Layers } from "lucide-react";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const reason = searchParams.get("reason");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -67,6 +71,16 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="card p-8 shadow-xl border-gray-100">
+          {reason === "account_deleted" && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2">
+              <span className="mt-0.5">🚫</span>
+              <span>
+                Your account has been removed. Please contact support if you
+                believe this is a mistake.
+              </span>
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-start gap-2">
               <span className="mt-0.5">⚠️</span>
