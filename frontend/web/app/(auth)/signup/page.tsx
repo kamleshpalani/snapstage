@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,14 +17,14 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signUp({
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -32,16 +34,36 @@ export default function SignupPage() {
     });
 
     if (error) {
-      setError(error.message);
+      // Map common Supabase errors to friendly messages
+      const msg =
+        error.message.includes("already registered") ||
+        error.message.includes("User already registered")
+          ? "An account with this email already exists. Try signing in instead."
+          : error.message.includes("Password should be")
+            ? "Password must be at least 6 characters."
+            : error.message.includes("invalid") &&
+                error.message.includes("email")
+              ? "Please enter a valid email address."
+              : error.message;
+      setError(msg);
       setLoading(false);
-    } else {
-      setSuccess(true);
-      setLoading(false);
+      return;
     }
+
+    // Email confirmation disabled → session returned immediately
+    if (data.session) {
+      router.push("/dashboard");
+      return;
+    }
+
+    // Email confirmation enabled → prompt user to check inbox
+    setSuccess(true);
+    setLoading(false);
   };
 
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
+    const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

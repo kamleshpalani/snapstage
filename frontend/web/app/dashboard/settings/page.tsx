@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SettingsPage() {
-  const supabase = createBrowserClient();
+  const supabase = createClient();
   const router = useRouter();
 
   const [fullName, setFullName] = useState("");

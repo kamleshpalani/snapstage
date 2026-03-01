@@ -1,8 +1,9 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2, Layers } from "lucide-react";
 
@@ -12,30 +13,35 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const supabase = createClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setError(error.message);
+      const msg = error.message.includes("Invalid login credentials")
+        ? "Incorrect email or password."
+        : error.message.includes("Email not confirmed")
+          ? "Please confirm your email before signing in."
+          : error.message;
+      setError(msg);
       setLoading(false);
     } else {
-      router.push("/dashboard");
-      router.refresh();
+      // Hard redirect so server-side middleware picks up the new session cookie
+      window.location.href = "/dashboard";
     }
   };
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
+    const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

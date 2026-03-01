@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const STAGING_STYLES = [
+  // ── Staging styles ──────────────────────────────────────────────
   {
     id: "modern",
     label: "Modern",
@@ -44,6 +45,277 @@ const STAGING_STYLES = [
     emoji: "🏡",
     description: "Classic & timeless",
   },
+  {
+    id: "bohemian",
+    label: "Bohemian",
+    emoji: "🪴",
+    description: "Eclectic, free-spirited",
+  },
+  {
+    id: "japandi",
+    label: "Japandi",
+    emoji: "🍃",
+    description: "Japanese-Scandi fusion",
+  },
+  {
+    id: "farmhouse",
+    label: "Farmhouse",
+    emoji: "🌾",
+    description: "Rustic, warm & inviting",
+  },
+  {
+    id: "art_deco",
+    label: "Art Deco",
+    emoji: "🔶",
+    description: "Bold geometry & glamour",
+  },
+  {
+    id: "mediterranean",
+    label: "Mediterranean",
+    emoji: "🌅",
+    description: "Warm terracotta & blue",
+  },
+  {
+    id: "mid_century",
+    label: "Mid-Century",
+    emoji: "🛋️",
+    description: "Retro 50s–60s style",
+  },
+  {
+    id: "minimalist",
+    label: "Minimalist",
+    emoji: "⬜",
+    description: "Less is more",
+  },
+  {
+    id: "maximalist",
+    label: "Maximalist",
+    emoji: "🎨",
+    description: "Bold, layered & vibrant",
+  },
+  {
+    id: "contemporary",
+    label: "Contemporary",
+    emoji: "🔲",
+    description: "Current trends, sleek",
+  },
+  {
+    id: "rustic",
+    label: "Rustic",
+    emoji: "🪵",
+    description: "Natural wood & stone",
+  },
+  {
+    id: "eclectic",
+    label: "Eclectic",
+    emoji: "🌀",
+    description: "Mix of styles & eras",
+  },
+  {
+    id: "french_country",
+    label: "French Country",
+    emoji: "🥐",
+    description: "Provence charm & warmth",
+  },
+  {
+    id: "hamptons",
+    label: "Hamptons",
+    emoji: "⛵",
+    description: "Preppy coastal elegance",
+  },
+  {
+    id: "tropical",
+    label: "Tropical",
+    emoji: "🌴",
+    description: "Lush, vibrant paradise",
+  },
+  {
+    id: "wabi_sabi",
+    label: "Wabi-Sabi",
+    emoji: "🌸",
+    description: "Beauty in imperfection",
+  },
+  {
+    id: "hollywood_regency",
+    label: "Hollywood Regency",
+    emoji: "🎬",
+    description: "Old Hollywood glamour",
+  },
+  {
+    id: "craftsman",
+    label: "Craftsman",
+    emoji: "🔨",
+    description: "Artisan wood & detail",
+  },
+  {
+    id: "victorian",
+    label: "Victorian",
+    emoji: "🏰",
+    description: "Ornate & grand",
+  },
+  {
+    id: "bauhaus",
+    label: "Bauhaus",
+    emoji: "📐",
+    description: "Form follows function",
+  },
+  {
+    id: "biophilic",
+    label: "Biophilic",
+    emoji: "🌱",
+    description: "Nature-infused living",
+  },
+  {
+    id: "zen",
+    label: "Zen",
+    emoji: "☯️",
+    description: "Calm, meditative space",
+  },
+  {
+    id: "urban_modern",
+    label: "Urban Modern",
+    emoji: "🌆",
+    description: "City-chic & sleek",
+  },
+  {
+    id: "dark_academia",
+    label: "Dark Academia",
+    emoji: "📚",
+    description: "Moody, scholarly style",
+  },
+  {
+    id: "cottagecore",
+    label: "Cottagecore",
+    emoji: "🌻",
+    description: "Whimsical countryside",
+  },
+  {
+    id: "southwestern",
+    label: "Southwestern",
+    emoji: "🌵",
+    description: "Desert earth tones",
+  },
+  {
+    id: "moroccan",
+    label: "Moroccan",
+    emoji: "🕌",
+    description: "Rich patterns & color",
+  },
+  {
+    id: "japanese_modern",
+    label: "Japanese Modern",
+    emoji: "⛩️",
+    description: "Clean meets tradition",
+  },
+  {
+    id: "korean_minimal",
+    label: "Korean Minimal",
+    emoji: "🏯",
+    description: "Clean, soft & refined",
+  },
+  {
+    id: "chinoiserie",
+    label: "Chinoiserie",
+    emoji: "🐉",
+    description: "Asian-inspired opulence",
+  },
+  {
+    id: "italian_villa",
+    label: "Italian Villa",
+    emoji: "🍕",
+    description: "Opulent European flair",
+  },
+  {
+    id: "tuscan",
+    label: "Tuscan",
+    emoji: "🍷",
+    description: "Warm Italian countryside",
+  },
+  {
+    id: "parisian",
+    label: "Parisian",
+    emoji: "🗼",
+    description: "Effortless French chic",
+  },
+  {
+    id: "brooklyn_loft",
+    label: "Brooklyn Loft",
+    emoji: "🧱",
+    description: "Raw & creative loft",
+  },
+  {
+    id: "alpine",
+    label: "Alpine",
+    emoji: "⛷️",
+    description: "Cozy mountain chalet",
+  },
+  {
+    id: "transitional",
+    label: "Transitional",
+    emoji: "🔄",
+    description: "Classic meets modern",
+  },
+  {
+    id: "organic_modern",
+    label: "Organic Modern",
+    emoji: "🪨",
+    description: "Natural shapes & calm",
+  },
+  {
+    id: "moody_dark",
+    label: "Moody Dark",
+    emoji: "🖤",
+    description: "Deep tones & drama",
+  },
+  {
+    id: "retro_70s",
+    label: "Retro 70s",
+    emoji: "🪗",
+    description: "Groovy vintage warmth",
+  },
+  {
+    id: "futuristic",
+    label: "Futuristic",
+    emoji: "🚀",
+    description: "Sci-fi inspired space",
+  },
+  {
+    id: "grandmillennial",
+    label: "Grandmillennial",
+    emoji: "🫖",
+    description: "Granny chic, reimagined",
+  },
+  {
+    id: "art_nouveau",
+    label: "Art Nouveau",
+    emoji: "🌺",
+    description: "Organic curves & nature",
+  },
+  {
+    id: "neoclassical",
+    label: "Neoclassical",
+    emoji: "🏛️",
+    description: "Ancient Greece meets glam",
+  },
+  {
+    id: "ski_chalet",
+    label: "Ski Chalet",
+    emoji: "🎿",
+    description: "Warm mountain lodge",
+  },
+  // ── Special modes ────────────────────────────────────────────────
+  {
+    id: "renovation",
+    label: "Renovation",
+    emoji: "🔨",
+    description: "Show full potential after reno",
+  },
+  {
+    id: "declutter",
+    label: "Declutter",
+    emoji: "🧹",
+    description: "Empty & clean empty room",
+  },
 ];
 
 export default function NewStagingPage() {
@@ -70,11 +342,35 @@ export default function NewStagingPage() {
     setLoading(true);
     setError(null);
 
+    const getErrorMessage = (err: unknown): string => {
+      if (err instanceof Error) return err.message;
+      if (err && typeof err === "object") {
+        const e = err as Record<string, unknown>;
+        if (typeof e.message === "string" && e.message) return e.message;
+        if (typeof e.error === "string") return e.error;
+        if (typeof e.details === "string") return e.details;
+        return JSON.stringify(err);
+      }
+      return "Something went wrong. Please try again.";
+    };
+
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error("Not authenticated. Please sign in again.");
+
+      // Ensure profile row exists (safety upsert in case trigger didn't fire)
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .upsert(
+          { id: user.id, email: user.email ?? "" },
+          { onConflict: "id", ignoreDuplicates: true },
+        );
+      if (profileError)
+        throw new Error(
+          `Profile setup failed: ${getErrorMessage(profileError)}`,
+        );
 
       // 1. Upload original image to Supabase Storage
       const fileExt = file.name.split(".").pop();
@@ -83,7 +379,8 @@ export default function NewStagingPage() {
         .from("room-images")
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError)
+        throw new Error(`Upload failed: ${getErrorMessage(uploadError)}`);
 
       // 2. Get public URL
       const {
@@ -104,24 +401,34 @@ export default function NewStagingPage() {
         .select()
         .single();
 
-      if (dbError) throw dbError;
+      if (dbError)
+        throw new Error(
+          `Failed to create project: ${getErrorMessage(dbError)}`,
+        );
 
-      // 4. Trigger AI staging via API
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      await fetch(`${apiUrl}/staging/generate`, {
+      // 4. Kick off Preview → Approve → HD workflow (v2 flow)
+      const stagingRes = await fetch("/api/staging/v2/preview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId: project.id,
           imageUrl: publicUrl,
           style: selectedStyle,
-          userId: user.id,
         }),
       });
 
-      router.push(`/dashboard/projects/${project.id}`);
+      const stagingData = await stagingRes.json().catch(() => ({}));
+      if (!stagingRes.ok) {
+        throw new Error(
+          stagingData.error ?? "Failed to start staging. Please try again.",
+        );
+      }
+
+      const requestId: string = stagingData.requestId;
+      router.push(`/dashboard/staging/${requestId}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      console.error("New staging error:", err);
+      setError(getErrorMessage(err));
       setLoading(false);
     }
   };
@@ -212,17 +519,18 @@ export default function NewStagingPage() {
           {loading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Generating staging...
+              Creating preview...
             </>
           ) : (
             <>
               <Sparkles className="w-5 h-5" />
-              Generate Staged Room
+              Generate Free Preview
             </>
           )}
         </button>
         <p className="text-center text-xs text-gray-400 mt-3">
-          This will use 1 credit · Usually takes 30–90 seconds
+          Free watermarked preview · Approve &amp; pay 1 credit for full HD
+          download
         </p>
       </form>
     </div>

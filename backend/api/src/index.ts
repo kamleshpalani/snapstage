@@ -2,15 +2,32 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { stagingRouter } from "./routes/staging";
+import { previewFlowRouter } from "./routes/previewFlow";
 import { paymentsRouter } from "./routes/payments";
+import { adminRouter } from "./routes/admin";
+import { emailsRouter } from "./routes/emails";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// ─── Middleware ──────────────────────────────────────────
+// ─── CORS (allow multiple origins: Vercel preview + production) ──────────────
+const allowedOrigins = new Set(
+  [
+    process.env.FRONTEND_URL || "http://localhost:3000",
+    process.env.APP_BASE_URL || "http://localhost:3000",
+  ].filter(Boolean),
+);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (Postman, curl, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.has(origin)) return callback(null, true);
+      // Allow Vercel preview deployments (*.vercel.app)
+      if (origin.endsWith(".vercel.app")) return callback(null, true);
+      callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
     credentials: true,
   }),
 );
@@ -21,13 +38,20 @@ app.use("/payments/webhook", express.raw({ type: "application/json" }));
 app.use(express.json({ limit: "10mb" }));
 
 // ─── Health Check ────────────────────────────────────────
+app.get("/", (_req, res) => {
+  res.json({ service: "SnapStage API", status: "ok" });
+});
+
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // ─── Routes ─────────────────────────────────────────────
 app.use("/staging", stagingRouter);
+app.use("/staging/v2", previewFlowRouter);
 app.use("/payments", paymentsRouter);
+app.use("/admin", adminRouter);
+app.use("/emails", emailsRouter);
 
 // ─── Error Handler ───────────────────────────────────────
 app.use(

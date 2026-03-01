@@ -18,11 +18,11 @@ import { supabase } from "@/lib/supabase";
 
 interface Project {
   id: string;
+  name: string;
   original_image_url: string;
   staged_image_url: string | null;
-  staging_style: string;
+  style: string;
   status: string;
-  credits_used: number;
   created_at: string;
 }
 
@@ -137,7 +137,7 @@ export default function ProjectDetailScreen() {
     <>
       <Stack.Screen
         options={{
-          title: `${project.staging_style.replace("_", " ")} Room`,
+          title: `${(project.style ?? "").replace(/_/g, " ")} Room`,
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => router.back()}
@@ -202,7 +202,7 @@ export default function ProjectDetailScreen() {
         <View style={styles.infoCard}>
           <Row
             label="Style"
-            value={project.staging_style.replace(/_/g, " ").toUpperCase()}
+            value={(project.style ?? "").replace(/_/g, " ").toUpperCase()}
           />
           <Row label="Status">
             <View
@@ -221,7 +221,6 @@ export default function ProjectDetailScreen() {
               </Text>
             </View>
           </Row>
-          <Row label="Credits Used" value={project.credits_used.toString()} />
           <Row
             label="Created"
             value={new Date(project.created_at).toLocaleDateString("en-US", {

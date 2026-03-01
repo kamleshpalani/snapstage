@@ -3,17 +3,17 @@
 import { useEffect, useState } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Link from "next/link";
-import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
-import { createBrowserClient } from "@/lib/supabase/client";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/utils";
 
 interface Project {
   id: string;
+  name: string;
   original_image_url: string;
   staged_image_url: string | null;
-  staging_style: string;
+  style: string;
   status: string;
-  credits_used: number;
   created_at: string;
 }
 
@@ -25,7 +25,9 @@ export default function ProjectDetailPage({
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
-  const supabase = createBrowserClient();
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
+  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
@@ -63,6 +65,33 @@ export default function ProjectDetailPage({
     }
     setProject(data);
     setLoading(false);
+  };
+
+  const handleRetry = async () => {
+    if (!project) return;
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      const res = await fetch("/api/staging/trigger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: project.id,
+          imageUrl: project.original_image_url,
+          style: project.style,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to start staging");
+      // Update local state optimistically
+      setProject((p) => (p ? { ...p, status: "processing" } : p));
+    } catch (err) {
+      setRetryError(
+        err instanceof Error ? err.message : "Failed to start staging",
+      );
+    } finally {
+      setRetrying(false);
+    }
   };
 
   const handleDownload = async (url: string, filename: string) => {
@@ -122,7 +151,7 @@ export default function ProjectDetailPage({
       <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 capitalize">
-            {project.staging_style.replace(/_/g, " ")} Room
+            {project.name || (project.style ?? "").replace(/_/g, " ") + " Room"}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             {formatDate(project.created_at)}
@@ -141,8 +170,8 @@ export default function ProjectDetailPage({
       {project.staged_image_url && project.status === "completed" ? (
         <div className="rounded-2xl overflow-hidden mb-6 shadow-md">
           <BeforeAfterSlider
-            beforeUrl={project.original_image_url}
-            afterUrl={project.staged_image_url}
+            beforeSrc={project.original_image_url}
+            afterSrc={project.staged_image_url}
           />
         </div>
       ) : (
@@ -173,11 +202,7 @@ export default function ProjectDetailPage({
           <dl className="space-y-3">
             <DetailRow
               label="Style"
-              value={project.staging_style.replace(/_/g, " ").toUpperCase()}
-            />
-            <DetailRow
-              label="Credits Used"
-              value={`${project.credits_used} credit${project.credits_used !== 1 ? "s" : ""}`}
+              value={(project.style ?? "").replace(/_/g, " ").toUpperCase()}
             />
             <DetailRow
               label="Project ID"
@@ -191,6 +216,32 @@ export default function ProjectDetailPage({
           <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">
             Actions
           </h2>
+          {retryError && (
+            <p className="text-xs text-red-600 bg-red-50 rounded-lg px-3 py-2">
+              {retryError}
+            </p>
+          )}
+          {(project.status === "pending" || project.status === "failed") && (
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="btn-primary flex items-center justify-center gap-2"
+            >
+              {retrying ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />{" "}
+                  Starting…
+                </>
+              ) : (
+                <>
+                  ✨{" "}
+                  {project.status === "failed"
+                    ? "Retry Staging"
+                    : "Start Staging"}
+                </>
+              )}
+            </button>
+          )}
           {project.staged_image_url && project.status === "completed" && (
             <>
               <button

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { stripe, STRIPE_PRICES, PLAN_CREDITS } from "../lib/stripe";
+import { getStripe, STRIPE_PRICES, PLAN_CREDITS } from "../lib/stripe";
 import { createClient } from "../lib/supabase";
 import Stripe from "stripe";
 
@@ -24,7 +24,7 @@ paymentsRouter.post("/create-checkout", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Invalid plan" });
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     customer_email: email,
@@ -44,7 +44,7 @@ paymentsRouter.post("/webhook", async (req: Request, res: Response) => {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!,
@@ -58,7 +58,7 @@ paymentsRouter.post("/webhook", async (req: Request, res: Response) => {
 
   switch (event.type) {
     case "checkout.session.completed": {
-      const session = event.data.object as Stripe.CheckoutSession;
+      const session = event.data.object as Stripe.Checkout.Session;
       const { userId, plan } = session.metadata || {};
 
       if (userId && plan) {

@@ -3,6 +3,10 @@ import { z } from "zod";
 import { createClient } from "../lib/supabase";
 import { generateStaging, getPredictionStatus } from "../lib/replicate";
 import type { StagingStyle } from "../lib/replicate";
+import {
+  sendStagingCompletedEmail,
+  sendAdminNewProjectEmail,
+} from "../lib/email";
 
 export const stagingRouter = Router();
 
@@ -16,6 +20,51 @@ const generateSchema = z.object({
     "coastal",
     "industrial",
     "traditional",
+    "bohemian",
+    "japandi",
+    "farmhouse",
+    "art_deco",
+    "mediterranean",
+    "mid_century",
+    "minimalist",
+    "maximalist",
+    "contemporary",
+    "rustic",
+    "eclectic",
+    "french_country",
+    "hamptons",
+    "tropical",
+    "wabi_sabi",
+    "hollywood_regency",
+    "craftsman",
+    "victorian",
+    "bauhaus",
+    "biophilic",
+    "zen",
+    "urban_modern",
+    "dark_academia",
+    "cottagecore",
+    "southwestern",
+    "moroccan",
+    "japanese_modern",
+    "korean_minimal",
+    "chinoiserie",
+    "italian_villa",
+    "tuscan",
+    "parisian",
+    "brooklyn_loft",
+    "alpine",
+    "transitional",
+    "organic_modern",
+    "moody_dark",
+    "retro_70s",
+    "futuristic",
+    "grandmillennial",
+    "art_nouveau",
+    "neoclassical",
+    "ski_chalet",
+    "renovation",
+    "declutter",
   ]),
   userId: z.string().uuid(),
 });
@@ -71,8 +120,24 @@ stagingRouter.post("/generate", async (req: Request, res: Response) => {
       description: `AI staging - ${style} style`,
     });
 
-    // Poll for result in background
-    pollForResult(projectId, result.predictionId, supabase);
+    // Poll for result in background — pass along context for email notification
+    pollForResult(projectId, result.predictionId, userId, style, supabase);
+
+    // Notify admin of new project (fire-and-forget)
+    void Promise.resolve(
+      supabase.from("profiles").select("email").eq("id", userId).single(),
+    )
+      .then(({ data: ownerProfile }) => {
+        if (ownerProfile?.email) {
+          sendAdminNewProjectEmail({
+            userEmail: ownerProfile.email,
+            projectId,
+            projectName: projectId,
+            style,
+          }).catch(console.error);
+        }
+      })
+      .catch(() => null);
 
     return res.json({
       success: true,
@@ -80,17 +145,18 @@ stagingRouter.post("/generate", async (req: Request, res: Response) => {
       projectId,
     });
   } catch (err) {
-    console.error("[Staging] Error:", err);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[Staging] Error:", errMsg);
 
     await supabase
       .from("projects")
       .update({
         status: "failed",
-        error_message: err instanceof Error ? err.message : "Generation failed",
+        error_message: errMsg,
       })
       .eq("id", projectId);
 
-    return res.status(500).json({ error: "Failed to start AI generation" });
+    return res.status(500).json({ error: errMsg });
   }
 });
 
@@ -101,7 +167,8 @@ stagingRouter.get(
     try {
       const result = await getPredictionStatus(req.params.predictionId);
       return res.json(result);
-    } catch (err) {
+    } catch (error_) {
+      console.error("Failed to get prediction status:", error_);
       return res.status(500).json({ error: "Failed to get status" });
     }
   },
@@ -111,6 +178,8 @@ stagingRouter.get(
 async function pollForResult(
   projectId: string,
   predictionId: string,
+  userId: string,
+  style: string,
   supabase: ReturnType<typeof createClient>,
 ) {
   const MAX_POLLS = 30;
@@ -122,6 +191,16 @@ async function pollForResult(
     const result = await getPredictionStatus(predictionId);
 
     if (result.status === "succeeded" && result.outputUrl) {
+      // Get project name + user email for notification
+      const [{ data: project }, { data: profile }] = await Promise.all([
+        supabase.from("projects").select("name").eq("id", projectId).single(),
+        supabase
+          .from("profiles")
+          .select("email, full_name")
+          .eq("id", userId)
+          .single(),
+      ]);
+
       await supabase
         .from("projects")
         .update({
@@ -130,6 +209,17 @@ async function pollForResult(
           updated_at: new Date().toISOString(),
         })
         .eq("id", projectId);
+
+      // Email user — fire-and-forget
+      if (profile?.email) {
+        sendStagingCompletedEmail({
+          to: profile.email,
+          name: profile.full_name || profile.email.split("@")[0],
+          projectId,
+          projectName: project?.name || "Your project",
+        }).catch(console.error);
+      }
+
       return;
     }
 

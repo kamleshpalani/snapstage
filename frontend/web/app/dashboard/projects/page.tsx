@@ -1,10 +1,9 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { BeforeAfterSlider } from "@/components/BeforeAfterSlider";
 
 export default async function ProjectsPage() {
-  const supabase = await createServerClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -94,7 +93,7 @@ export default async function ProjectsPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-slate-800 capitalize">
-                  {project.staging_style.replace(/_/g, " ")}
+                  {(project.style ?? "").replace(/_/g, " ")}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
                   {new Date(project.created_at).toLocaleDateString("en-US", {
