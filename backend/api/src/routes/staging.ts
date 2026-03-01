@@ -100,17 +100,18 @@ stagingRouter.post("/generate", async (req: Request, res: Response) => {
       projectId,
     });
   } catch (err) {
-    console.error("[Staging] Error:", err);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[Staging] Error:", errMsg);
 
     await supabase
       .from("projects")
       .update({
         status: "failed",
-        error_message: err instanceof Error ? err.message : "Generation failed",
+        error_message: errMsg,
       })
       .eq("id", projectId);
 
-    return res.status(500).json({ error: "Failed to start AI generation" });
+    return res.status(500).json({ error: errMsg });
   }
 });
 

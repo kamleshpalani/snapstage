@@ -40,8 +40,8 @@ export async function generateStaging(
   const prompt = STYLE_PROMPTS[style];
 
   const prediction = await replicate.predictions.create({
-    // Stable Diffusion img2img for room staging
-    version: "854e8727697a057c525cdb45ab037f64ecca770a4c5f776e7a98cbed7f11b58",
+    // adirik/interior-design — best public model for room staging
+    model: "adirik/interior-design",
     input: {
       image: imageUrl,
       prompt: `A beautifully staged empty room with ${prompt}`,
@@ -50,8 +50,6 @@ export async function generateStaging(
       prompt_strength: 0.65,
       num_inference_steps: 30,
       guidance_scale: 7.5,
-      width: 1024,
-      height: 768,
     },
   });
 
