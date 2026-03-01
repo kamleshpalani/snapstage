@@ -24,7 +24,7 @@ export default function SignupPage() {
     setError(null);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -34,12 +34,31 @@ export default function SignupPage() {
     });
 
     if (error) {
-      setError(error.message);
+      // Map common Supabase errors to friendly messages
+      const msg =
+        error.message.includes("already registered") ||
+        error.message.includes("User already registered")
+          ? "An account with this email already exists. Try signing in instead."
+          : error.message.includes("Password should be")
+            ? "Password must be at least 6 characters."
+            : error.message.includes("invalid") &&
+                error.message.includes("email")
+              ? "Please enter a valid email address."
+              : error.message;
+      setError(msg);
       setLoading(false);
-    } else {
-      setSuccess(true);
-      setLoading(false);
+      return;
     }
+
+    // Email confirmation disabled → session returned immediately
+    if (data.session) {
+      router.push("/dashboard");
+      return;
+    }
+
+    // Email confirmation enabled → prompt user to check inbox
+    setSuccess(true);
+    setLoading(false);
   };
 
   const handleGoogleSignup = async () => {
