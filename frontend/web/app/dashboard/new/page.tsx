@@ -70,11 +70,31 @@ export default function NewStagingPage() {
     setLoading(true);
     setError(null);
 
+    const getErrorMessage = (err: unknown): string => {
+      if (err instanceof Error) return err.message;
+      if (err && typeof err === "object") {
+        const e = err as Record<string, unknown>;
+        if (typeof e.message === "string" && e.message) return e.message;
+        if (typeof e.error === "string") return e.error;
+        if (typeof e.details === "string") return e.details;
+        return JSON.stringify(err);
+      }
+      return "Something went wrong. Please try again.";
+    };
+
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error("Not authenticated. Please sign in again.");
+
+      // Ensure profile row exists (safety upsert in case trigger didn't fire)
+      await supabase
+        .from("profiles")
+        .upsert(
+          { id: user.id, email: user.email ?? "" },
+          { onConflict: "id", ignoreDuplicates: true },
+        );
 
       // 1. Upload original image to Supabase Storage
       const fileExt = file.name.split(".").pop();
@@ -83,7 +103,8 @@ export default function NewStagingPage() {
         .from("room-images")
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError)
+        throw new Error(`Upload failed: ${getErrorMessage(uploadError)}`);
 
       // 2. Get public URL
       const {
@@ -104,24 +125,34 @@ export default function NewStagingPage() {
         .select()
         .single();
 
-      if (dbError) throw dbError;
+      if (dbError)
+        throw new Error(
+          `Failed to create project: ${getErrorMessage(dbError)}`,
+        );
 
-      // 4. Trigger AI staging via API
+      // 4. Trigger AI staging via API (non-blocking — don't let this stop the redirect)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      await fetch(`${apiUrl}/staging/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          projectId: project.id,
-          imageUrl: publicUrl,
-          style: selectedStyle,
-          userId: user.id,
-        }),
-      });
+      if (apiUrl) {
+        fetch(`${apiUrl}/staging/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectId: project.id,
+            imageUrl: publicUrl,
+            style: selectedStyle,
+            userId: user.id,
+          }),
+        }).catch((fetchErr) => console.error("Staging API error:", fetchErr));
+      } else {
+        console.warn(
+          "NEXT_PUBLIC_API_URL is not set — staging generation skipped.",
+        );
+      }
 
       router.push(`/dashboard/projects/${project.id}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      console.error("New staging error:", err);
+      setError(getErrorMessage(err));
       setLoading(false);
     }
   };
