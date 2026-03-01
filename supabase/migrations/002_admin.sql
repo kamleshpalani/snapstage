@@ -117,34 +117,44 @@ create policy "Users can mark own notifications read"
 
 -- password_reset_tokens: service role only (no user-level select policy)
 
--- ─── 7. Admin can SELECT all profiles + projects (for admin panel queries) ───
-drop policy if exists "Admins can view all profiles" on public.profiles;
-create policy "Admins can view all profiles"
-  on public.profiles for select
-  using (
-    auth.uid() = id
-    or exists (
-      select 1 from public.profiles p2
-      where p2.id = auth.uid() and p2.is_admin = true
-    )
+-- ─── 7. Security-definer helper to check is_admin (avoids RLS recursion) ────
+-- Queries profiles bypassing RLS so policies on profiles can safely call it.
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select coalesce(
+    (select is_admin from public.profiles where id = auth.uid()),
+    false
   );
+$$;
 
--- Drop the old single-user policy (replaced by the combined one above)
+-- ─── 8. Admin can SELECT all profiles + projects (for admin panel queries) ───
+drop policy if exists "Admins can view all profiles" on public.profiles;
 drop policy if exists "Users can view own profile" on public.profiles;
+create policy "Users and admins can view profiles"
+  on public.profiles for select
+  using (auth.uid() = id or public.is_admin());
 
 drop policy if exists "Admins can view all projects" on public.projects;
-create policy "Admins can view all projects"
-  on public.projects for select
-  using (
-    auth.uid() = user_id
-    or exists (
-      select 1 from public.profiles
-      where id = auth.uid() and is_admin = true
-    )
-  );
-
--- Drop old single-user policy (replaced above)
 drop policy if exists "Users can view own projects" on public.projects;
+create policy "Users and admins can view projects"
+  on public.projects for select
+  using (auth.uid() = user_id or public.is_admin());
+
+-- Also fix the audit_logs & project_notes admin policies to use the helper
+drop policy if exists "Admins can view audit logs" on public.audit_logs;
+create policy "Admins can view audit logs"
+  on public.audit_logs for select
+  using (public.is_admin());
+
+drop policy if exists "Admins can view all project notes" on public.project_notes;
+create policy "Admins can view all project notes"
+  on public.project_notes for select
+  using (public.is_admin());
 
 -- ─── 8. Grant yourself admin access (run once, replace the UUID) ────────────
 -- UPDATE public.profiles SET is_admin = true WHERE id = 'YOUR_USER_UUID';
