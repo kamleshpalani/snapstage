@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import JobStatusBadge from "@/components/JobStatusBadge";
@@ -115,7 +115,6 @@ const STYLE_LABELS: Record<string, string> = {
 
 export default function StagingWorkflowPage() {
   const { requestId } = useParams<{ requestId: string }>();
-  const router = useRouter();
   const supabase = createClient();
 
   const [data, setData] = useState<PollResponse | null>(null);

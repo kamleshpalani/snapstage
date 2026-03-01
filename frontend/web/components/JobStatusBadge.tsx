@@ -66,7 +66,7 @@ export default function JobStatusBadge({
   status,
   className = "",
 }: Readonly<JobStatusBadgeProps>) {
-  const cfg = CONFIG[status as Status] ?? {
+  const cfg = CONFIG[status] ?? {
     label: status,
     color: "bg-gray-100 text-gray-600",
     dot: "bg-gray-400",

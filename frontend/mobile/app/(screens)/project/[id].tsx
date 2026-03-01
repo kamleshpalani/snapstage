@@ -26,6 +26,15 @@ interface Project {
   created_at: string;
 }
 
+function BackButton() {
+  const router = useRouter();
+  return (
+    <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 4 }}>
+      <Ionicons name="chevron-back" size={24} color="#0f172a" />
+    </TouchableOpacity>
+  );
+}
+
 export default function ProjectDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -136,14 +145,7 @@ export default function ProjectDetailScreen() {
       <Stack.Screen
         options={{
           title: `${(project.style ?? "").replaceAll("_", " ")} Room`,
-          headerLeft: () => (
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{ marginLeft: 4 }}
-            >
-              <Ionicons name="chevron-back" size={24} color="#0f172a" />
-            </TouchableOpacity>
-          ),
+          headerLeft: BackButton,
         }}
       />
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
